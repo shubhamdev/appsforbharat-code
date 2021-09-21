@@ -28,6 +28,37 @@
   color: #61dafb;
 }
 
+.completed {
+  text-decoration: line-through;
+}
+
+.footer {
+  
+  background-color: #c3a3a3;
+
+}
+.displayItem {
+
+  display: flex;
+    padding: 0.1rem;
+    background-color: #e2e2e2;
+    margin: 0.1rem;
+}
+
+.wrap {
+
+  text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 99%;
+    text-align: start;
+}
+
+.itemText {
+  margin: 0.25rem;
+}
+
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
