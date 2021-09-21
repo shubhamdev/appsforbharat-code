@@ -75,12 +75,18 @@ function TodoList(props) {
   // Fir up event when drag ends (Will update the state data as well)
   const dragEnd = async () => {
     let copyData = [...data];
+    let deepCopyData = [...deepCopy];
     const result = swapData(
       copyData,
       findIndexOf(copyData, currentTarget),
       findIndexOf(copyData, dragOverValue)
     );
-    updateDeepCopy("updateRecord", "", result);
+    const result1 = swapData(
+      deepCopyData,
+      findIndexOf(deepCopyData, currentTarget),
+      findIndexOf(deepCopyData, dragOverValue)
+    );
+    updateDeepCopy("swap", "", result1);
     await setState(result, setData);
   };
 

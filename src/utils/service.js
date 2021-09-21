@@ -14,21 +14,18 @@ export const updateDeepCopyData = (key, deepCopy, id, data = []) => {
       });
       return deepCopy;
     case "updateRecord":
-      if (data.length === deepCopy.length) {
-        return data;
-      } else {
-        deepCopy = deepCopy.map((item) => {
-          data &&
-            data.map((j) => {
-              if (j.id === item.id) {
-                item = j;
-              }
-            });
-          return item;
-        });
-        return deepCopy;
-      }
-
+      deepCopy = deepCopy.map((item) => {
+        data &&
+          data.map((j) => {
+            if (j.id === item.id) {
+              item = j;
+            }
+          });
+        return item;
+      });
+      return deepCopy;
+    case "swap":
+      return data;
     default:
       return deepCopy;
   }
