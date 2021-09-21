@@ -30,6 +30,7 @@
 
 .completed {
   text-decoration: line-through;
+  color: #b5a6a6;
 }
 
 .footer {
@@ -40,7 +41,7 @@
 .displayItem {
 
   display: flex;
-    padding: 0.1rem;
+    padding: 0.2rem;
     background-color: #e2e2e2;
     margin: 0.1rem;
 }

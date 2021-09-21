@@ -30,7 +30,7 @@ function TodoList(props) {
   const markCompleted = async (e) => {
     const copyData = [...data].map((item) => {
       if (item.id === parseInt(e.target.value, 10)) {
-        item.isCompleted = true;
+        item.isCompleted = !item.isCompleted;
       }
       return item;
     });
@@ -166,7 +166,10 @@ function TodoList(props) {
                     onPressEnter={() => onEnter(index)}
                   />
                 ) : (
-                  <span onDoubleClick={() => markEdit(index)} className="wrap">
+                  <span
+                    onDoubleClick={() => markEdit(index)}
+                    className={item?.isCompleted ? "wrap completed" : "wrap"}
+                  >
                     {" "}
                     {item.title}
                   </span>
