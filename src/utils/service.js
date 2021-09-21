@@ -16,7 +16,7 @@ export const updateDeepCopyData = (key, deepCopy, id, data = []) => {
     case "updateRecord":
       deepCopy = deepCopy.map((item) => {
         data &&
-          data.map((j) => {
+          data.forEach((j) => {
             if (j.id === item.id) {
               item = j;
             }
