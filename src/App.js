@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import { Row, Col } from "antd";
 import Todo from "./components/Todo";

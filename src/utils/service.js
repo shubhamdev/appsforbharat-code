@@ -1,5 +1,9 @@
-export const deepCopyData = (key, deepCopy, id, data = []) => {
-  // let copyDeepCopy = [...deepCopy];
+export const deepCopyData = (data) => {
+  const copy = JSON.stringify(data);
+  return JSON.parse(copy);
+};
+
+export const updateDeepCopyData = (key, deepCopy, id, data = []) => {
   switch (key) {
     case "completed":
       deepCopy = deepCopy.map((item) => {
@@ -9,22 +13,19 @@ export const deepCopyData = (key, deepCopy, id, data = []) => {
         return item;
       });
       return deepCopy;
-      break;
-
     case "updateRecord":
       deepCopy = deepCopy.map((item) => {
-        data.map((j) => {
-          if (j.id === item.id) {
-            item = j;
-          }
-        });
+        data &&
+          data.map((j) => {
+            if (j.id === item.id) {
+              item = j;
+            }
+          });
         return item;
       });
       return deepCopy;
-      break;
     default:
       return deepCopy;
-      break;
   }
 };
 
@@ -33,4 +34,11 @@ export const swapData = (arr, from, to) => {
   arr[from] = arr[to];
   arr[to] = aux;
   return arr;
+};
+
+// Find index of element in given array
+export const findIndexOf = (data, index) => {
+  return data.findIndex(
+    (item) => item.title.toLowerCase() === index.toLowerCase()
+  );
 };

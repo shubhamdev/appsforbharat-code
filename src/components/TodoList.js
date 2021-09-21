@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Card, Input, Radio, Tooltip, Button } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
-import { deepCopyData, swapData } from "../utils/service";
+import { Card, Input, Radio, Tooltip } from "antd";
+import {
+  deepCopyData,
+  updateDeepCopyData,
+  swapData,
+  findIndexOf,
+} from "../utils/service";
 import Footer from "./Footer";
-const deepCopy1 = (data) => {
-  const copy = JSON.stringify(data);
-  return JSON.parse(copy);
-};
 
-// this component will recive data from Todo
 function TodoList(props) {
-  // todo list data
   const [data, setData] = useState(props.data);
-  // Deep copy data for filter and other operation
   const [deepCopy, setDeepCopy] = useState([]);
-  // Set filter value 1: All, 2: completed, 3: Pending
   const [filterValue, setFilterValue] = useState(1);
   const [currentTarget, setCurrentTarget] = useState("");
   const [dragOverValue, setDragoverValue] = useState("");
@@ -22,7 +18,7 @@ function TodoList(props) {
 
   //Update Deep copy
   const updateDeepCopy = async (key, id, data = []) => {
-    const deepCopyResult = deepCopyData(key, [...deepCopy], id, data);
+    const deepCopyResult = updateDeepCopyData(key, [...deepCopy], id, data);
     await setState(deepCopyResult, setDeepCopy);
   };
 
@@ -38,6 +34,7 @@ function TodoList(props) {
     await setState(copyData, setData);
   };
 
+  // Set all the state (it's a generic function that will update the state)
   const setState = async (value, callback) => {
     await callback(value);
   };
@@ -69,18 +66,14 @@ function TodoList(props) {
     }
   };
 
+  // Gives element where the drag recently get passes
   const dragOver = async (e) => {
     e.preventDefault();
     await setState(e.target.innerText, setDragoverValue);
   };
 
-  const findIndexOf = (data, index) => {
-    return data.findIndex(
-      (item) => item.title.toLowerCase() === index.toLowerCase()
-    );
-  };
-
-  const dragEnd = async (e, index) => {
+  // Fir up event when drag ends (Will update the state data as well)
+  const dragEnd = async () => {
     let copyData = [...data];
     const result = swapData(
       copyData,
@@ -91,7 +84,7 @@ function TodoList(props) {
     await setState(result, setData);
   };
 
-  //
+  // Capture the start element from where the drag started
   const dragStart = async (e) => {
     if (e.currentTarget && e.currentTarget.innerText) {
       await setState(e.currentTarget.innerText, setCurrentTarget);
@@ -100,6 +93,7 @@ function TodoList(props) {
     e.dataTransfer.setData("text/html", e.currentTarget);
   };
 
+  // Enable edit inside todo list item
   const markEdit = async (index) => {
     const copy = [...data];
     copy[index].isEdit = true;
@@ -107,6 +101,7 @@ function TodoList(props) {
     await setState(copy, setData);
   };
 
+  // Update the title value and close the edit feature
   const onEnter = async (index) => {
     const copy = [...data];
     copy[index].title = updatedTitle;
@@ -115,15 +110,16 @@ function TodoList(props) {
     await setState(copy, setData);
   };
 
-  const updateRecord = async (event, index) => {
+  // Fire up this function onchange value of title
+  const onTitleChange = async (event) => {
     await setState(event.target.value, setUpdatedTitle);
   };
 
+  // Will update initial state value for todo list and deep copy of the given list
   useEffect(() => {
     if (props.todoList && props.todoList.length > 0) {
-      // Set default data to the list
       setState(props.todoList, setData);
-      const copiedData = deepCopy1(props.todoList);
+      const copiedData = deepCopyData(props.todoList);
       if (copiedData && copiedData.length) {
         setState(copiedData, setDeepCopy);
       }
@@ -162,7 +158,7 @@ function TodoList(props) {
                     placeholder="Enter todo title"
                     maxLength={160}
                     value={updatedTitle}
-                    onChange={(e) => updateRecord(e, index)}
+                    onChange={(e) => onTitleChange(e, index)}
                     onPressEnter={() => onEnter(index)}
                   />
                 ) : (
