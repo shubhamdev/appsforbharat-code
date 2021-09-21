@@ -19,7 +19,6 @@ function Todo() {
         isEdit: false,
         isCompleted: false,
         id: copyPrev.length + 1,
-        // isDrag: false,
       });
       setTodoList(copyPrev);
     } else {

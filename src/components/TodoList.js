@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Input, Radio, Tooltip, Button } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
-
+import { deepCopyData, swapData } from "../utils/service";
 import Footer from "./Footer";
 const deepCopy1 = (data) => {
   const copy = JSON.stringify(data);
@@ -22,103 +22,79 @@ function TodoList(props) {
 
   //Update Deep copy
   const updateDeepCopy = async (key, id, data = []) => {
-    let copyDeepCopy = [...deepCopy];
-    switch (key) {
-      case "completed":
-        copyDeepCopy = copyDeepCopy.map((item) => {
-          if (item.id === parseInt(id, 10)) {
-            item.isCompleted = true;
-          }
-          return item;
-        });
-        await setDeepCopy(copyDeepCopy);
-        break;
-
-      case "updateRecord":
-        copyDeepCopy = copyDeepCopy.map((item) => {
-          data.map((j) => {
-            if (j.id === item.id) {
-              item = j;
-            }
-          });
-          return item;
-        });
-        await setDeepCopy(copyDeepCopy);
-        break;
-      default:
-        break;
-    }
+    const deepCopyResult = deepCopyData(key, [...deepCopy], id, data);
+    await setState(deepCopyResult, setDeepCopy);
   };
 
   // Mark item as completed (used async because set state is synchronous)
   const markCompleted = async (e) => {
-    let copyData = [...data];
-    copyData = copyData.map((item) => {
+    const copyData = [...data].map((item) => {
       if (item.id === parseInt(e.target.value, 10)) {
         item.isCompleted = true;
       }
       return item;
     });
     updateDeepCopy("completed", e.target.value);
-    await setData(copyData);
+    await setState(copyData, setData);
+  };
+
+  const setState = async (value, callback) => {
+    await callback(value);
   };
 
   // Filter data bases on user selection (All/Completed/Pending)
   const todoFilter = async (e) => {
-    await setFilterValue(e.target.value);
+    setState(e.target.value, setFilterValue);
     filterList(e.target.value);
   };
 
   // Set filtered data in actual state
   const filterList = (id) => {
-    let filterData = [];
+    let filterData = deepCopy ? deepCopy : [];
     switch (id) {
       case 1:
-        filterData = deepCopy;
-        setData(filterData);
+        setState(filterData, setData);
         break;
       case 2:
         filterData = deepCopy.filter((item) => item.isCompleted === true);
-        setData(filterData);
+        setState(filterData, setData);
         break;
       case 3:
         filterData = deepCopy.filter((item) => item.isCompleted !== true);
-        setData(filterData);
+        setState(filterData, setData);
         break;
       default:
+        setState(filterData, setData);
         break;
     }
   };
 
   const dragOver = async (e) => {
     e.preventDefault();
-    await setDragoverValue(e.target.innerText);
+    await setState(e.target.innerText, setDragoverValue);
   };
 
-  const swapData = (arr, from, to) => {
-    const aux = arr[from];
-    arr[from] = arr[to];
-    arr[to] = aux;
-    return arr;
+  const findIndexOf = (data, index) => {
+    return data.findIndex(
+      (item) => item.title.toLowerCase() === index.toLowerCase()
+    );
   };
 
   const dragEnd = async (e, index) => {
     let copyData = [...data];
-    const from = copyData.findIndex(
-      (item) => item.title.toLowerCase() === currentTarget.toLowerCase()
+    const result = swapData(
+      copyData,
+      findIndexOf(copyData, currentTarget),
+      findIndexOf(copyData, dragOverValue)
     );
-    const to = copyData.findIndex(
-      (item) => item.title.toLowerCase() === dragOverValue.toLowerCase()
-    );
-    const result = swapData(copyData, from, to);
     updateDeepCopy("updateRecord", "", result);
-    await setData(result);
+    await setState(result, setData);
   };
 
   //
   const dragStart = async (e) => {
     if (e.currentTarget && e.currentTarget.innerText) {
-      await setCurrentTarget(e.currentTarget.innerText);
+      await setState(e.currentTarget.innerText, setCurrentTarget);
     }
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/html", e.currentTarget);
@@ -127,8 +103,8 @@ function TodoList(props) {
   const markEdit = async (index) => {
     const copy = [...data];
     copy[index].isEdit = true;
-    await setUpdatedTitle(copy[index].title);
-    await setData(copy);
+    await setState(copy[index].title, setUpdatedTitle);
+    await setState(copy, setData);
   };
 
   const onEnter = async (index) => {
@@ -136,20 +112,20 @@ function TodoList(props) {
     copy[index].title = updatedTitle;
     copy[index].isEdit = false;
     updateDeepCopy("updateRecord", "", copy);
-    await setData(copy);
+    await setState(copy, setData);
   };
 
   const updateRecord = async (event, index) => {
-    await setUpdatedTitle(event.target.value);
+    await setState(event.target.value, setUpdatedTitle);
   };
 
   useEffect(() => {
     if (props.todoList && props.todoList.length > 0) {
       // Set default data to the list
-      setData(props.todoList);
+      setState(props.todoList, setData);
       const copiedData = deepCopy1(props.todoList);
       if (copiedData && copiedData.length) {
-        setDeepCopy(copiedData);
+        setState(copiedData, setDeepCopy);
       }
     }
   }, [props.todoList]);
